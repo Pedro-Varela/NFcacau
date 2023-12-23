@@ -1,13 +1,24 @@
 import xml.etree.ElementTree as ET
 import openpyxl
 import os
+import tkinter as tk
+from tkinter import filedialog
+import functions as f
+
+
+tk_window = tk.Tk()
+tk_window.withdraw()  # para nao ter uma janela tkinter inteira aberta. Só quero a janela de seleção de arquivo 
+
+file_path = filedialog.askopenfilename(filetypes=[("XML files", "*.xml")])
+print(file_path)  # Caminho para o arquivo XML selecionado
+
+
 
 
 # Caminho do seu arquivo XML
-xml_file = '001206201.xml'
 
 # Carregar o arquivo XML
-tree = ET.parse(xml_file)
+tree = ET.parse(file_path)
 root = tree.getroot()
 
 #root contém todo o xml
@@ -23,6 +34,13 @@ arquivo_excel = 'dados_produtos.xlsx'
 # Buscar um elemento específico, incluindo o namespace
 numero_nota = root.find('.//nfe:nNF', namespaces).text
 
+if f.verificar_numero_nota(numero_nota):
+    print("Este arquivo XML já foi processado.")
+else:
+    # Processar o arquivo XML
+    # ...
+    f.registrar_numero_nota(numero_nota)
+
 # Iterar sobre todos os elementos 'prod'
 # Assumindo que você já definiu 'root' e 'namespaces' corretamente
 produtos = []
@@ -32,43 +50,27 @@ for prod in root.findall('.//nfe:prod', namespaces):
     dados_do_produto = {}
 
     # Extrair e armazenar cada dado do produto
-    dados_do_produto['cProd'] = prod.find('nfe:cProd', namespaces).text.lstrip('0d') if prod.find('nfe:cProd', namespaces) is not None else ''
-    dados_do_produto['xProd'] = prod.find('nfe:xProd', namespaces).text if prod.find('nfe:xProd', namespaces) is not None else ''
-    dados_do_produto['vProd'] = prod.find('nfe:vProd', namespaces).text if prod.find('nfe:vProd', namespaces) is not None else ''
-    # Repita para outros campos conforme necessário
 
+    #Codigo do produto
+    dados_do_produto['cProd'] = prod.find('nfe:cProd', namespaces).text.lstrip('0') if prod.find('nfe:cProd', namespaces) is not None else ''
+    #Descrição do produto
+    dados_do_produto['xProd'] = prod.find('nfe:xProd', namespaces).text if prod.find('nfe:xProd', namespaces) is not None else ''
+    #Valor do produto
+    dados_do_produto['vProd'] = prod.find('.//nfe:vProd', namespaces).text if prod.find('.//nfe:vProd', namespaces) is not None else ''
+    #ICMS 
+    
+    #parei aqui, falta colocar ICMS e fazer o resto do codigo 
     # Adicionar os dados do produto à lista de produtos
     produtos.append(dados_do_produto)
 
 
+    # Supondo que 'numero_nota' seja extraído do arquivo XML
 
-def adicionar_dados_ao_excel(arquivo_excel, numero_nota, dados_produtos):
-    # Verificar se o arquivo Excel existe
-    if os.path.exists(arquivo_excel):
-        workbook = openpyxl.load_workbook(arquivo_excel)
-    else:
-        workbook = openpyxl.Workbook()
-        # Adicionar cabeçalhos se for um novo arquivo
-        headers = ['Número da Nota', 'Código do Produto', 'Descrição do Produto', 'Valor do Produto']
-        workbook.active.append(headers)
-
-    sheet = workbook.active
-
-    # Adicionar os dados dos produtos
-    for produto in dados_produtos:
-        row = [
-            numero_nota, 
-            produto['cProd'],  # Certificando que é uma string
-            produto['xProd'],  # Certificando que é uma string
-            produto['vProd']   # Certificando que é uma string
-        ]
-        sheet.append(row)
-
-    # Salvar o arquivo Excel
-    workbook.save(arquivo_excel)
+    
 
 
-adicionar_dados_ao_excel(arquivo_excel, numero_nota, produtos)
+
+f.adicionar_dados_ao_excel(arquivo_excel, numero_nota, produtos)
 
 
 
