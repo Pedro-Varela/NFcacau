@@ -21,7 +21,27 @@ def adicionar_dados_ao_excel_produtos(arquivo_excel, numero_nota, dados_produtos
     else:
         workbook = openpyxl.Workbook()
         # Adicionar cabeçalhos se for um novo arquivo
-        headers = ['NúmeroNota','EAN','NCM','CEST', 'Código', 'Descrição','QTD','Vunit', 'VTotal','nLote', 'dFab', 'dVal','vICMS','pICMS', 'vIPI', 'pIPI','vPIS', 'pPIS', 'vCOFINS', 'pCOFINS']
+        headers = ['NúmeroNota',
+                   'EAN',
+                   'NCM',
+                   'CEST', 
+                   'Código', 
+                   'Descrição',
+                   'QTD',
+                   'Vunit', 
+                   'VTotal',
+                   'nLote', 
+                   'dFab', 
+                   'dVal',
+                   'vICMS',
+                   'pICMS', 
+                   'vIPI', 
+                   'pIPI',
+                   'vPIS', 
+                   'pPIS', 
+                   'vCOFINS', 
+                   'pCOFINS']
+        
         workbook.active.append(headers)
 
     sheet = workbook.active
@@ -57,6 +77,7 @@ def adicionar_dados_ao_excel_produtos(arquivo_excel, numero_nota, dados_produtos
     # Salvar o arquivo Excel
         
 
+
 def adicionar_dados_ao_excel_notas(arquivo_excel, numero_nota, dados_notas):
     # Verificar se o arquivo Excel existe
     if os.path.exists(arquivo_excel):
@@ -64,25 +85,43 @@ def adicionar_dados_ao_excel_notas(arquivo_excel, numero_nota, dados_notas):
     else:
         workbook = openpyxl.Workbook()
         # Adicionar cabeçalhos se for um novo arquivo
-        headers = ['Número da Nota', 'Data de Emissão', 'Data de Saída', 'Valor Total da Nota', 'Valor Total dos Produtos', 'Valor Total do ICMS']
+        headers = [
+            'Número da Nota', 'Data de Emissão', 'Data de Saída/Entrada', 'Código Município', 'Tipo de Impressão', 
+            'CNPJ Emitente', 'Nome Emitente', 'Nome Fantasia Emitente', 'IE Emitente', 'Município Emitente', 'UF Emitente', 'CNAE Emitente', 
+            'Valor Total da Nota', 'Valor Total dos Produtos', 'Valor Total do ICMS', 'Valor Total do PIS', 'Valor Total do COFINS', 
+            'Nome Transportador', 'CNPJ Transportador'
+        ]
         workbook.active.append(headers)
 
     sheet = workbook.active
 
-    # Adicionar os dados dos produtos
+    # Adicionar os dados das notas
     for nota in dados_notas:
         row = [
             numero_nota, 
             nota['dhEmi'],  
             nota['dhSaiEnt'],  
+            nota['cMunFG'],  
+            nota['tpImp'],  
+            nota['CNPJ_emit'],  
+            nota['xNome_emit'],  
+            nota['xFant_emit'],  
+            nota['IE_emit'],  
+            nota['xMun_emit'],  
+            nota['UF_emit'],  
+            nota['CNAE_emit'],  
             nota['vNF'],   
-            nota['vProd'],  
-            nota['vICMS']    
+            nota['vProd_totais'],  
+            nota['vICMS_totais'],    
+            nota['vPIS_totais'],    
+            nota['vCOFINS_totais'],    
+            nota['xNome_transp'],  
+            nota['CNPJ_transp']  
         ]
         sheet.append(row)
 
-
-    workbook.save(arquivo_excel)
     # Salvar o arquivo Excel
+    workbook.save(arquivo_excel)
+
 
 

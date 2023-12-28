@@ -20,7 +20,8 @@ root = tree.getroot()
 
 # Definir os namespaces
 namespaces = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
-arquivo_excel = 'dados_produtos.xlsx'
+arquivo_excel_produtos  = 'dados_produtos.xlsx'
+arquivo_excel_nota = 'dados_notas.xlsx'
 
 #ao usar o ElementTree, cada vez que se busca uma tag, o namespace tem que vir antes, tipo a url inteira para
 #achar a tag especifica, então eu defino esse dicionario em python para poder chamalo sempre que eu quiser procurar uma tag
@@ -137,13 +138,55 @@ for i, produto in enumerate(produtos):
 
 
 
+# Criar o dicionário fora dos loops para acumular dados da nota
+dados_da_nota = {}
 infonota = []
-#for info in root.findall()
+# Loop para extrair informações da tag 'ide'
+for info in root.findall('.//nfe:ide', namespaces):
+    # Preenchendo dados da nota
+    dados_da_nota['dhEmi'] = info.find('nfe:dhEmi', namespaces).text if info.find('nfe:dhEmi', namespaces) is not None else ''
+    dados_da_nota['dhSaiEnt'] = info.find('nfe:dhSaiEnt', namespaces).text if info.find('nfe:dhSaiEnt', namespaces) is not None else ''
+    dados_da_nota['cMunFG'] = info.find('nfe:cMunFG', namespaces).text if info.find('nfe:cMunFG', namespaces) is not None else ''
+    dados_da_nota['tpImp'] = info.find('nfe:tpImp', namespaces).text if info.find('nfe:tpImp', namespaces) is not None else ''
 
+# Loop para extrair informações da tag 'emit'
+for info in root.findall('.//nfe:emit', namespaces):
+    # Preenchendo dados da nota
+    dados_da_nota['CNPJ_emit'] = info.find('nfe:CNPJ', namespaces).text if info.find('nfe:CNPJ', namespaces) is not None else ''  # Mudança no nome da chave para evitar sobreposição
+    dados_da_nota['xNome_emit'] = info.find('nfe:xNome', namespaces).text if info.find('nfe:xNome', namespaces) is not None else ''
+    dados_da_nota['xFant_emit'] = info.find('nfe:xFant', namespaces).text if info.find('nfe:xFant', namespaces) is not None else ''
+    dados_da_nota['IE_emit'] = info.find('nfe:IE', namespaces).text if info.find('nfe:IE', namespaces) is not None else ''
+    dados_da_nota['CNAE_emit'] = info.find('nfe:CNAE', namespaces).text if info.find('nfe:CNAE', namespaces) is not None else ''
+
+
+for info in root.findall('.//nfe:enderEmit', namespaces):
+    dados_da_nota['xMun_emit'] = info.find('nfe:xMun', namespaces).text if info.find('nfe:xMun', namespaces) is not None else ''
+    dados_da_nota['UF_emit'] = info.find('nfe:UF', namespaces).text if info.find('nfe:UF', namespaces) is not None else ''
+    
+# Loop para extrair informações da tag 'totais'
+for info in root.findall('.//nfe:ICMSTot', namespaces):
+    # Preenchendo dados da nota
+    dados_da_nota['vNF'] = info.find('nfe:vNF', namespaces).text if info.find('nfe:vNF', namespaces) is not None else ''
+    dados_da_nota['vProd_totais'] = info.find('nfe:vProd', namespaces).text if info.find('nfe:vProd', namespaces) is not None else ''  # Mudança no nome da chave para evitar sobreposição
+    dados_da_nota['vICMS_totais'] = info.find('nfe:vICMS', namespaces).text if info.find('nfe:vICMS', namespaces) is not None else ''
+    dados_da_nota['vPIS_totais'] = info.find('nfe:vPIS', namespaces).text if info.find('nfe:vPIS', namespaces) is not None else ''
+    dados_da_nota['vCOFINS_totais'] = info.find('nfe:vCOFINS', namespaces).text if info.find('nfe:vCOFINS', namespaces) is not None else ''
+
+# Loop para extrair informações da tag 'transporta'
+for info in root.findall('.//nfe:transporta', namespaces):
+    # Preenchendo dados da nota
+    dados_da_nota['xNome_transp'] = info.find('nfe:xNome', namespaces).text if info.find('nfe:xNome', namespaces) is not None else ''  # Mudança no nome da chave para evitar sobreposição
+    dados_da_nota['CNPJ_transp'] = info.find('nfe:CNPJ', namespaces).text if info.find('nfe:CNPJ', namespaces) is not None else ''  # Mudança no nome da chave para evitar sobreposição
+
+# Agora 'dados_da_nota' contém todas as informações reunidas
+    
+infonota.append(dados_da_nota)
+
+print(dados_da_nota)
 # Adicionar os dados do produto ao arquivo Excel
-f.adicionar_dados_ao_excel_produtos(arquivo_excel, numero_nota, produtos)
+f.adicionar_dados_ao_excel_produtos(arquivo_excel_produtos, numero_nota, produtos)
 
 
-#f.adicionar_dados_ao_excel_notas(arquivo_excel, numero_nota, infonota)
+f.adicionar_dados_ao_excel_notas(arquivo_excel_nota, numero_nota, infonota)
 
 
