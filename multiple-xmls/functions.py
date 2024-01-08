@@ -88,7 +88,7 @@ def adicionar_dados_ao_excel_notas(arquivo_excel, numero_nota, dados_notas):
         workbook = openpyxl.Workbook()
         # Adicionar cabeçalhos se for um novo arquivo
         headers = [
-            'Número da Nota', 'Data de Emissão', 'Data de Saída/Entrada', 'Código Município', 'Tipo de Impressão', 
+            'Número da Nota', 'Data de Emissão', 'Data de Saída/Entrada','DataVenc1','DataVenc2', 'Código Município', 'Tipo de Impressão', 
             'CNPJ Emitente', 'Nome Emitente', 'Nome Fantasia Emitente', 'IE Emitente', 'Município Emitente', 'UF Emitente', 'CNAE Emitente', 
             'Valor Total da Nota', 'Valor Total dos Produtos', 'Valor Total do ICMS', 'Valor Total do PIS', 'Valor Total do COFINS', 
             'Nome Transportador', 'CNPJ Transportador'
@@ -97,12 +97,19 @@ def adicionar_dados_ao_excel_notas(arquivo_excel, numero_nota, dados_notas):
 
     sheet = workbook.active
 
+
     # Adicionar os dados das notas
     for nota in dados_notas:
+        datas_vencimento = nota.get('datasVencimento', [])
+        data_venc_1 = datas_vencimento[0] if len(datas_vencimento) > 0 else ''
+        data_venc_2 = datas_vencimento[1] if len(datas_vencimento) > 1 else ''
+        
         row = [
           numero_nota,
             nota.get('dhEmi', ''),  
             nota.get('dhSaiEnt', ''),  
+            data_venc_1,
+            data_venc_2,
             nota.get('cMunFG', ''),  
             nota.get('tpImp', ''),  
             nota.get('CNPJ_emit', ''),  

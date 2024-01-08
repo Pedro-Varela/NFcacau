@@ -154,6 +154,8 @@ for arquivo_xml in arquivos_xml:
     # Criar o dicionário fora dos loops para acumular dados da nota
     dados_da_nota = {}
     infonota = []
+    datas_vencimento = []
+
     # Loop para extrair informações da tag 'ide'
     for info in root.findall('.//nfe:ide', namespaces):
         # Preenchendo dados da nota
@@ -191,6 +193,13 @@ for arquivo_xml in arquivos_xml:
         dados_da_nota['xNome_transp'] = info.find('nfe:xNome', namespaces).text if info.find('nfe:xNome', namespaces) is not None else ''  # Mudança no nome da chave para evitar sobreposição
         dados_da_nota['CNPJ_transp'] = info.find('nfe:CNPJ', namespaces).text if info.find('nfe:CNPJ', namespaces) is not None else ''  # Mudança no nome da chave para evitar sobreposição
 
+
+    for dup in root.findall('.//nfe:dup', namespaces):
+        data_venc = dup.find('.//nfe:dVenc', namespaces).text
+        datas_vencimento.append(data_venc)
+    
+    # Adicionar datas de vencimento ao dicionário dados_da_nota
+    dados_da_nota['datasVencimento'] = datas_vencimento
     # Agora 'dados_da_nota' contém todas as informações reunidas
         
     infonota.append(dados_da_nota)
@@ -198,9 +207,8 @@ for arquivo_xml in arquivos_xml:
     print(dados_da_nota)
     print(dados_do_produto)
     # Adicionar os dados do produto ao arquivo Excel
+    
     f.adicionar_dados_ao_excel_produtos(arquivo_excel_produtos, numero_nota, produtos)
-
-
     f.adicionar_dados_ao_excel_notas(arquivo_excel_nota, numero_nota, infonota)
 
 
